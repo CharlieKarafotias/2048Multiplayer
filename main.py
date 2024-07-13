@@ -36,34 +36,42 @@ def spawn_new_number_block(board):
         board[available_spots[idx_on_board_to_update]] = 2
     return board
 
-def shift_row(row, shift_left):
+def fill_deleted(row, pad=4):
+    padded = row
+    while len(padded) != pad:
+        padded.append(None)
+    return padded
+
+def shift_row(row, shift_right):
     updated_row = row
-    done = False
-    if shift_left:
+    if shift_right:
         updated_row.reverse()
     
-    # process left to right
-    for i in range(len(updated_row)):
-        if not done and i + 1 < len(updated_row):
-            curr = updated_row[i]
-            next = updated_row[i+1]
-            print(curr, next)
-            if isCombinable(curr, next):
-                updated_row[i+1] = nextNumber(curr)
-                updated_row.remove(i)
-                updated_row.insert(0, None)
+    done = False
+    i = 0
+    while not done:
+        if len(updated_row) <= i:
                 done = True
-            elif next is None:
-                # fix bug, when 2 None 2 4 should become None None 4 4 
-                updated_row[i+1] = curr
-                print(i)
-                
-                print(updated_row)
-                # updated_row.remove(i)
-                # updated_row.insert(0, None)
+                break
+        curr = updated_row[i]
+        print(updated_row, curr, i)
+        if curr is None:
+            del updated_row[i]
+        elif len(updated_row) > i+1 and isCombinable(curr, updated_row[i+1]):
+            updated_row[i] = nextNumber(curr)
+            del updated_row[i+1]
+        elif len(updated_row) > i+1:
+            i += 1
+        else:
+            # out of elements or cant combine
+            done = True
 
-    if shift_left:
+    fill_deleted(updated_row)
+
+    if shift_right:
         updated_row.reverse()
+    
+    print(updated_row)
     
     return updated_row
 
@@ -86,10 +94,29 @@ def player_move(board, input):
         case 'right':
             pass
     return board
+
 # Graphics
+def print_board(board, split_on=4):
+    rows = []
+    while board:
+        rows.append(board[:split_on])
+        del board[:split_on]
+    for r in rows:
+        print(r)
+    
 
 
-print(shift_row([2, None, 2, 4], False))
+assert(shift_row([None, None, None, None], True) == [None, None, None, None])
+assert(shift_row([2, None, None, None], True) == [None, None, None, 2])
+assert(shift_row([2, 2, None, None], True) == [None, None, None, 4])
+assert(shift_row([2, 4, None, None], True) == [None, None, 2, 4])
+print('failing cases:')
+assert(shift_row([None, 2, None, 2], True) == [None, None, None, 4])
+# assert(shift_row([2, 2, 2, 2], True) == [None, 2, 2, 4])
+
+
+# print(shift_row([2, None, 2, 4], False))
+
 # board = start_game()
 # print(board)
 # player_move(board, 'up')

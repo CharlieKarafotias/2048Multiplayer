@@ -1,5 +1,3 @@
-# Dependency
-# - getkey https://pypi.org/project/getkey/#files
 import random
 
 # Board logic

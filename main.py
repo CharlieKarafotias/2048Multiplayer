@@ -107,13 +107,29 @@ def player_move(board, input):
             # update board
             board = flatten(transpose(columns))
         case 'down':
-            columns = [[], [], [], []]
+            columns = [[], [], [], []] # TODO: make dynamic in future, what if board is 6x6
             for (idx, elem) in enumerate(board):
-                columns[idx % 4] = columns[idx % 4].append(elem)
+                columns[idx % len(columns)].append(elem)
+            # shift columns
+            columns = [shift_row(r, True) for r in columns]
+            # update board
+            board = flatten(transpose(columns))
         case 'left':
-            pass
+            rows = [[], [], [], []] # TODO: make dynamic in future, what if board is 6x6
+            for (idx, elem) in enumerate(board):
+                rows[idx // len(rows)].append(elem)
+            # shift rows
+            rows = [shift_row(r, False) for r in rows]
+            # update board
+            board = flatten(rows)
         case 'right':
-            pass
+            rows = [[], [], [], []] # TODO: make dynamic in future, what if board is 6x6
+            for (idx, elem) in enumerate(board):
+                rows[idx // len(rows)].append(elem)
+            # shift rows
+            rows = [shift_row(r, True) for r in rows]
+            # update board
+            board = flatten(rows)
     return board
 
 # Graphics
@@ -127,7 +143,6 @@ def print_board(board, split_on=4):
         print(r)
     print()
     
-
 
 # assert(shift_row([None, None, None, None], True) == [None, None, None, None])
 # assert(shift_row([2, None, None, None], True) == [None, None, None, 2])
@@ -143,4 +158,4 @@ def print_board(board, split_on=4):
 
 board = start_game()
 print_board(board)
-print_board(player_move(board, 'up'))
+print_board(player_move(board, 'right'))

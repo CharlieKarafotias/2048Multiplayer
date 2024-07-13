@@ -1,3 +1,5 @@
+# Dependency
+# - getkey https://pypi.org/project/getkey/#files
 import random
 
 # Board logic
@@ -156,6 +158,9 @@ def print_board(board, split_on=4):
 # assert(shift_row([None, 2, 2, 4], False) == [4, 4, None, None])
 
 
-board = start_game()
-print_board(board)
-print_board(player_move(board, 'right'))
+# board = start_game()
+# while not hasWon:
+#     print_board(board)
+#     # wait for player move
+#     # player_move(board, 'right')
+#     break

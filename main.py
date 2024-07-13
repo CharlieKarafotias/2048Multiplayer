@@ -36,49 +36,49 @@ def spawn_new_number_block(board):
         board[available_spots[idx_on_board_to_update]] = 2
     return board
 
-def fill_deleted(row, pad=4):
+def fill_deleted(row, pad=4, insert_in_front=False):
     padded = row
     while len(padded) != pad:
-        padded.append(None)
+        if insert_in_front:
+            padded.insert(0, None)
+        else:
+            padded.append(None)
     return padded
 
-def shift_row(row, shift_right):
-    updated_row = row
-    if shift_right:
-        updated_row.reverse()
-    
+def shift_row(row, l_to_r):
+    updated_row = [x for x in row if x is not None]
     done = False
-    i = 0
-    while not done:
-        if len(updated_row) <= i:
+    
+    if l_to_r:
+        i = len(updated_row) - 1
+        while not done and i >= 1:
+            curr = updated_row[i]
+            prev = updated_row[i-1]
+            if isCombinable(prev, curr):
+                updated_row[i] = nextNumber(curr)
+                del updated_row[i-1]
                 done = True
-                break
-        curr = updated_row[i]
-        print(updated_row, curr, i)
-        if curr is None:
-            del updated_row[i]
-        elif len(updated_row) > i+1 and isCombinable(curr, updated_row[i+1]):
-            updated_row[i] = nextNumber(curr)
-            del updated_row[i+1]
-        elif len(updated_row) > i+1:
+            i -= 1
+        
+        fill_deleted(updated_row,insert_in_front=True)
+    else:
+        i = 0
+        while not done and i+1 < len(updated_row):
+            curr = updated_row[i]
+            next = updated_row[i+1]
+            if isCombinable(curr, next):
+                updated_row[i] = nextNumber(curr)
+                del updated_row[i+1]
+                done = True
             i += 1
-        else:
-            # out of elements or cant combine
-            done = True
-
-    fill_deleted(updated_row)
-
-    if shift_right:
-        updated_row.reverse()
+        fill_deleted(updated_row,insert_in_front=False)
     
-    print(updated_row)
-    
+
     return updated_row
 
 def player_move(board, input):
     match input.lower():
         case 'up':
-            # [2, None, None, None, None, 2, None, None, None, None, None, None, None, None, None, None]
             print(board)
             columns = [[], [], [], []]
             for (idx, elem) in enumerate(board):
@@ -110,9 +110,10 @@ assert(shift_row([None, None, None, None], True) == [None, None, None, None])
 assert(shift_row([2, None, None, None], True) == [None, None, None, 2])
 assert(shift_row([2, 2, None, None], True) == [None, None, None, 4])
 assert(shift_row([2, 4, None, None], True) == [None, None, 2, 4])
-print('failing cases:')
 assert(shift_row([None, 2, None, 2], True) == [None, None, None, 4])
-# assert(shift_row([2, 2, 2, 2], True) == [None, 2, 2, 4])
+assert(shift_row([2, 2, 2, 2], True) == [None, 2, 2, 4])
+assert(shift_row([2, 2, 2, 2], False) == [4, 2, 2, None])
+
 
 
 # print(shift_row([2, None, 2, 4], False))

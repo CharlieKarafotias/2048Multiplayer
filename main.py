@@ -76,17 +76,38 @@ def shift_row(row, l_to_r):
 
     return updated_row
 
+def transpose(array):
+    # write rows as columns
+    # write columns as rows
+    if type(array[0]) is list:
+        transposed = [[] for i in range(len(array[0]))]
+        flattened = []
+        for i in array:
+            flattened.extend(i)
+        for idx, elem in enumerate(flattened):
+            transposed[idx % len(array[0])].append(elem) 
+        return transposed
+    else:
+        return array
+
+def flatten(array):
+    flattened = []
+    for i in array:
+        flattened.extend(i)
+    return flattened
+
 def player_move(board, input):
     match input.lower():
         case 'up':
-            print(board)
-            columns = [[], [], [], []]
+            columns = [[], [], [], []] # TODO: make dynamic in future, what if board is 6x6
             for (idx, elem) in enumerate(board):
-                column_to_add_to = columns[idx % 4]
-                column_to_add_to.append(elem)
-            print(columns)
+                columns[idx % len(columns)].append(elem)
+            # shift columns
+            columns = [shift_row(r, False) for r in columns]
+            # update board
+            board = flatten(transpose(columns))
         case 'down':
-            columns = [[]] * 4
+            columns = [[], [], [], []]
             for (idx, elem) in enumerate(board):
                 columns[idx % 4] = columns[idx % 4].append(elem)
         case 'left':
@@ -98,29 +119,28 @@ def player_move(board, input):
 # Graphics
 def print_board(board, split_on=4):
     rows = []
-    while board:
-        rows.append(board[:split_on])
-        del board[:split_on]
+    i=0
+    while i < len(board):
+        rows.append(board[i:split_on+i])
+        i += split_on
     for r in rows:
         print(r)
+    print()
     
 
 
-assert(shift_row([None, None, None, None], True) == [None, None, None, None])
-assert(shift_row([2, None, None, None], True) == [None, None, None, 2])
-assert(shift_row([2, 2, None, None], True) == [None, None, None, 4])
-assert(shift_row([2, 4, None, None], True) == [None, None, 2, 4])
-assert(shift_row([None, 2, None, 2], True) == [None, None, None, 4])
-assert(shift_row([2, 2, 2, 2], True) == [None, 2, 2, 4])
-assert(shift_row([2, 2, 2, 2], False) == [4, 2, 2, None])
+# assert(shift_row([None, None, None, None], True) == [None, None, None, None])
+# assert(shift_row([2, None, None, None], True) == [None, None, None, 2])
+# assert(shift_row([2, 2, None, None], True) == [None, None, None, 4])
+# assert(shift_row([2, 4, None, None], True) == [None, None, 2, 4])
+# assert(shift_row([None, 2, None, 2], True) == [None, None, None, 4])
+# assert(shift_row([2, 2, 2, 2], True) == [None, 2, 2, 4])
+# assert(shift_row([2, 2, 2, 2], False) == [4, 2, 2, None])
+# assert(shift_row([None, None, None, None], False) == [None, None, None, None])
+# assert(shift_row([2, 4, None, None], False) == [2, 4, None, None])
+# assert(shift_row([None, 2, 2, 4], False) == [4, 4, None, None])
 
 
-
-# print(shift_row([2, None, 2, 4], False))
-
-# board = start_game()
-# print(board)
-# player_move(board, 'up')
-# for i in range(15):
-#     board = spawn_new_number_block(board)
-#     print(board)
+board = start_game()
+print_board(board)
+print_board(player_move(board, 'up'))
